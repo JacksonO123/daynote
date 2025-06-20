@@ -52,8 +52,12 @@ if [[ "$1" = "rm" ]]; then
       echo "this file has changes in it, are you sure you want to delete (y/n)?"
       read res
       if [[ "$res" == "y" ]]; then
+      echo "removing $filename"
         rm "$dir/$filename"
       fi
+    else
+      echo "removing $filename"
+      rm "$dir/$filename"
     fi
 
     exit 0
