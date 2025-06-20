@@ -1,0 +1,49 @@
+#! /usr/bin/env bash
+
+DIR=$(pwd)
+DATE=$(date +"%m-%d-%y")
+FILENAME="$DATE.md"
+CMD="vim"
+CONF="$HOME/.config/daynote/daynote.conf"
+STARTUP_FILE="$HOME/.config/daynote/startup.md"
+DEBUG=false
+DEFAULT_STARTUP="goals for today\n- \n\ndone today\n- \n\ngoing forward\n- "
+
+if [[ "$1" = "rm" ]]; then
+  if [[ -f "$DIR/$FILENAME" ]]; then
+    rm "$DIR/$FILENAME"
+    exit 0
+  fi
+elif [[ "$1" = "-d" ]]; then
+  DEBUG=true
+fi
+
+if [[ -f "$CONF" ]]; then
+  if [[ $DEBUG == true ]]; then
+    echo "found $CONF"
+    echo "<-------------->"
+    cat "$CONF"
+    echo "<-------------->"
+  fi
+
+  CMD=$(grep -oE "cmd=\w+" "$CONF" | cut -d'=' -f2)
+fi
+
+if [[ -f "$DIR/$FILENAME" ]]; then
+  echo "$FILENAME exists"
+else
+  echo "creating $FILENAME"
+  if [[ -f "$STARTUP_FILE" ]]; then
+    cp "$STARTUP_FILE" "$FILENAME"
+  else
+    echo -e "$DEFAULT_STARTUP" >> "$FILENAME"
+  fi
+fi
+
+if [[ -n "$CMD" ]]; then
+  if [[ $DEBUG == true ]]; then
+    echo "opening with $CMD"
+  fi
+
+  eval "$CMD $FILENAME"
+fi
