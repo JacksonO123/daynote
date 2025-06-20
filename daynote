@@ -1,13 +1,40 @@
 #! /usr/bin/env bash
 
+# config dirs
+CONF="$HOME/.config/daynote/daynote.conf"
+STARTUP_FILE="$HOME/.config/daynote/startup.txt"
+
 DIR=$(pwd)
 DATE=$(date +"%m-%d-%y")
-FILENAME="$DATE.md"
 CMD="vim"
-CONF="$HOME/.config/daynote/daynote.conf"
-STARTUP_FILE="$HOME/.config/daynote/startup.md"
-DEBUG=false
+EXT="md"
 DEFAULT_STARTUP="goals for today\n- \n\ndone today\n- \n\ngoing forward\n- "
+
+DEBUG=false
+if [[ "$1" = "-d" ]]; then
+  DEBUG=true
+fi
+
+get_config_prop() {
+  echo "$(grep -oE "$1=\w+" "$CONF" | cut -d'=' -f2)"
+}
+
+if [[ -f "$CONF" ]]; then
+  if [[ $DEBUG == true ]]; then
+    echo "found $CONF"
+    echo ">>>>>>"
+    cat "$CONF"
+    echo "<<<<<<"
+  fi
+
+  CMD=$(get_config_prop "cmd")
+  TEMP_EXT=$(get_config_prop "ext")
+  if [[ "$TEMP_EXT" != "" ]]; then
+    EXT="$TEMP_EXT"
+  fi
+fi
+
+FILENAME="$DATE.$EXT"
 
 if [[ "$1" = "rm" ]]; then
   if [[ -f "$DIR/$FILENAME" ]]; then
@@ -16,17 +43,6 @@ if [[ "$1" = "rm" ]]; then
   fi
 elif [[ "$1" = "-d" ]]; then
   DEBUG=true
-fi
-
-if [[ -f "$CONF" ]]; then
-  if [[ $DEBUG == true ]]; then
-    echo "found $CONF"
-    echo "<-------------->"
-    cat "$CONF"
-    echo "<-------------->"
-  fi
-
-  CMD=$(grep -oE "cmd=\w+" "$CONF" | cut -d'=' -f2)
 fi
 
 if [[ -f "$DIR/$FILENAME" ]]; then
